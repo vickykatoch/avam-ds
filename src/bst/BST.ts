@@ -8,6 +8,12 @@ import { Node } from "./node";
  */
 export type Comparer<T> = (left: T, right: T) => 1 | 0 | -1;
 
+export enum TraversalType {
+  PreOrder,
+  InOrder,
+  PostOrder,
+}
+
 export class BST<T> {
   //#region LOCAL STATE
   private head?: Node<T>;
@@ -27,8 +33,18 @@ export class BST<T> {
   }
   update(item: T): void {}
 
-  remove(item: T): void {
-    
+  remove(item: T): void {}
+
+  traverse(type: TraversalType, callBack: (item: T) => void): void {
+    if (this.head) {
+      if (type === TraversalType.PreOrder) {
+        this.traversePreOrder(this.head, callBack);
+      } else if (type === TraversalType.InOrder) {
+        this.traverseInOrder(this.head, callBack);
+      } else {
+        this.traversePostOrder(this.head, callBack);
+      }
+    }
   }
   //#endregion
 
@@ -42,7 +58,22 @@ export class BST<T> {
         : (node.right = new Node(value));
     }
   }
-  
+
+  private traversePreOrder(node: Node<T>, callBack: (item: T) => void) {
+    callBack(node!.value);
+    node.left && this.traversePreOrder(node.left, callBack);
+    node.right && this.traversePreOrder(node.right, callBack);
+  }
+  private traverseInOrder(node: Node<T>, callBack: (item: T) => void) {
+    node.left && this.traverseInOrder(node.left, callBack);
+    callBack(node!.value);
+    node.right && this.traverseInOrder(node.right, callBack);
+  }
+  private traversePostOrder(node: Node<T>, callBack: (item: T) => void) {
+    node.left && this.traversePostOrder(node.left, callBack);
+    node.right && this.traversePostOrder(node.right, callBack);
+    callBack(node!.value);
+  }
   //#endregion
 }
 
@@ -61,5 +92,12 @@ bst.add(200);
 bst.add(25);
 bst.add(39);
 bst.add(165);
-
-console.log(bst);
+console.log('===========IN-ORDER -- STARTS===========');
+bst.traverse(TraversalType.InOrder, (item) => console.log(item));
+console.log('===========*******************===========\n\n');
+console.log('===========PRE-ORDER -- STARTS===========');
+bst.traverse(TraversalType.PreOrder, (item) => console.log(item));
+console.log('===========*******************===========\n\n');
+console.log('===========POST-ORDER -- STARTS===========');
+bst.traverse(TraversalType.PostOrder, (item) => console.log(item));
+console.log('===========*******************===========\n\n');
